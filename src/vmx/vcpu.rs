@@ -1178,4 +1178,8 @@ impl<H: AxVCpuHal> AxArchVCpu for VmxVcpu<H> {
     fn set_gpr(&mut self, reg: usize, val: usize) {
         self.regs_mut().set_reg_of_index(reg as u8, val as u64);
     }
+
+    fn inject_interrupt(&mut self, vector: usize) -> AxResult {
+        Ok(self.queue_event(vector as u8, None))
+    }
 }
