@@ -9,7 +9,7 @@ cfg-if = "1.0"
 bitflags = "2.2"
 bit_field = "0.10"
 x86 = "0.52"
-x86_64 = "0.14"
+x86_64 = "=0.14.12"
 raw-cpuid = "11.0"
 numeric-enum-macro = "0.2"
 
@@ -18,10 +18,13 @@ page_table_entry = "0.4.1"
 memory_addr = "0.3.1"
 crate_interface = "0.1"
 
-axaddrspace = { git = "https://github.com/arceos-hypervisor/axaddrspace.git" }
+axaddrspace = { git = "https://github.com/arceos-hypervisor/axaddrspace.git", branch = "inject_interrupt" }
 axvcpu = { git = "https://github.com/arceos-hypervisor/axvcpu.git", branch = "inject_interrupt" }
 
 [features]
 default = ["vmx"]
 vmx = []
 amd = []
+
+[patch.crates-io]
+page_table_entry = { git = "https://github.com/arceos-hypervisor/page_table_multiarch.git", branch = "fix_old_x86_64" }

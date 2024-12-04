@@ -1,4 +1,5 @@
 use alloc::collections::VecDeque;
+use axaddrspace::device::{AccessWidth, Port};
 use bit_field::BitField;
 use core::fmt::{Debug, Formatter, Result};
 use core::{arch::asm, mem::size_of};
@@ -11,7 +12,7 @@ use x86_64::registers::control::{Cr0, Cr0Flags, Cr3, Cr4, Cr4Flags, EferFlags};
 
 use axaddrspace::{GuestPhysAddr, GuestVirtAddr, HostPhysAddr, NestedPageFaultInfo};
 use axerrno::{ax_err, ax_err_type, AxResult};
-use axvcpu::{AccessWidth, AxArchVCpu, AxVCpuExitReason, AxVCpuHal};
+use axvcpu::{AxArchVCpu, AxVCpuExitReason, AxVCpuHal};
 
 use super::as_axerr;
 use super::definitions::VmxExitReason;
@@ -1138,7 +1139,7 @@ impl<H: AxVCpuHal> AxArchVCpu for VmxVcpu<H> {
                             };
 
                             if io_info.is_in {
-                                AxVCpuExitReason::IoRead { port, width }
+                                AxVCpuExitReason::IoRead { port: Port(port), width }
                             } else {
                                 if port == QEMU_EXIT_PORT
                                     && width == AccessWidth::Word
@@ -1147,7 +1148,7 @@ impl<H: AxVCpuHal> AxArchVCpu for VmxVcpu<H> {
                                     AxVCpuExitReason::SystemDown
                                 } else {
                                     AxVCpuExitReason::IoWrite {
-                                        port,
+                                        port: Port(port),
                                         width,
                                         data: self.regs().rax.get_bits(width.bits_range()),
                                     }
