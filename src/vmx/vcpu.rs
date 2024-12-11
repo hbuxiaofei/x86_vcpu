@@ -358,7 +358,7 @@ impl<H: AxVCpuHal> VmxVcpu<H> {
         // By default, I/O bitmap is set as `intercept_all`.
         // Todo: these should be combined with emulated pio device management,
         // in `modules/axvm/src/device/x86_64/mod.rs` somehow.
-        let io_to_be_intercepted = [
+        let _io_to_be_intercepted = [
             // UART
             // 0x3f8..0x3f8 + 8, // COM1
             // We need to intercepted the access to COM2 ports.
@@ -382,6 +382,12 @@ impl<H: AxVCpuHal> VmxVcpu<H> {
             0x87..0x87 + 1,   // port about dma
             0x60..0x60 + 1,   // ports about ps/2 controller
             0x64..0x64 + 1,   // ports about ps/2 controller
+            0xcf8..0xcf8 + 8, // PCI
+        ];
+        let io_to_be_intercepted = [
+            // RTC
+            0x70..0x70 + 2,   // CMOS
+            0x510..0x510 + 2, // fw_cfg
             0xcf8..0xcf8 + 8, // PCI
         ];
         for port_range in io_to_be_intercepted {
@@ -423,6 +429,7 @@ impl<H: AxVCpuHal> VmxVcpu<H> {
             vmx::vmclear(paddr).map_err(as_axerr)?;
         }
         self.bind_to_current_processor()?;
+        self.setup_io_bitmap()?;
         self.setup_vmcs_guest(entry)?;
         self.setup_vmcs_control(ept_root, true)?;
         self.unbind_from_current_processor()?;
